@@ -1,0 +1,50 @@
+Training Method
+sLevenberg-Marquardt Learning Method:The Levenberg-Marquardt algorithm, also known as the damped least-squares method, has been designed to work specifically with loss functions which take the form of a sum of squared errors. It works without computing the exact Hessian matrix. Instead, it works with the gradient vector and the Jacobian matrix.
+Consider a loss function which can be expressed as a sum of squared errors of the form
+f = ∑ ei2,   i=0,...,m
+
+Here m is the number of instances in the data set.
+We can define the Jacobian matrix of the loss function as that containing the derivatives of the errors with respect to the parameters,
+Ji,jf(w) = dei/dwj (i = 1,...,m & j = 1,...,n)
+
+Where m is the number of instances in the data set and n is the number of parameters in the neural network. Note that the size of the Jacobian matrix is m·n.
+The gradient vector of the loss function can be computed as:
+ᐁf = 2 JT·e
+
+Here e is the vector of all error terms.
+Finally, we can approximate the Hessian matrix with the following expression.
+Hf ≈ 2 JT·J + λI
+
+Where λ is a damping factor that ensures the positiveness of the Hessian and I is the identity matrix.
+The next expression defines the parameters improvement process with the Levenberg-Marquardt algorithm
+wi+1 = wi - (JiT·Ji+λiI)-1·(2 JiT·ei),   i=0,1,...
+When the damping parameter λ is zero, this is just Newton's method, using the approximate Hessian matrix. On the other hand, when λ is large, this becomes gradient descent with a small training rate.
+The parameter λ is initialized to be large so that first updates are small steps in the gradient descent direction. If any iteration happens to result in a failure, then λ is increased by some factor. Otherwise, as the loss decreases, λ is decreased, so that the Levenberg-Marquardt algorithm approaches the Newton method. This process typically accelerates the convergence to the minimum.
+The picture below represents a state diagram for the training process of a neural network with the Levenberg-Marquardt algorithm. The first step is to calculate the loss, the gradient and the Hessian approximation. Then the damping parameter is adjusted so as to reduce the loss at each iteration.
+
+As we have seen the Levenberg-Marquardt algorithm is a method tailored for functions of the type sum-of-squared-error. That makes it to be very fast when training neural networks measured on that kind of errors. However, this algorithm has some drawbacks. The first one is that it cannot be applied to functions such as the root mean squared error or the cross entropy error. Also, it is not compatible with regularization terms. Finally, for very big data sets and neural networks, the Jacobian matrix becomes huge, and therefore it requires a lot of memory. Therefore, the Levenberg-Marquardt algorithm is not recommended when we have big data sets and/or neural networks.
+2. Gradient Conjugate Method: In the conjugate gradient training algorithm, the search is performed along conjugate directions which produces generally faster convergence than gradient descent directions. These training directions are conjugated with respect to the Hessian matrix.
+Let denote d the training direction vector. Then, starting with an initial parameter vector w0 and an initial training direction vector d0 = -g0, the conjugate gradient method constructs a sequence of training directions as:
+di+1 = gi+1 + di·γi,   i=0,1,...
+Here γ is called the conjugate parameter, and there are different ways to calculate it. Two of the most used are due to Fletcher and Reeves and to Polak and Ribiere. For all conjugate gradient algorithms, the training direction is periodically reset to the negative of the gradient.
+The parameters are then improved according to the next expression. The training rate, η, is usually found by line minimization.
+wi+1 = wi + di·ηi,   i=0,1,...
+The picture below depicts an activity diagram for the training process with the conjugate gradient. Here improvement of the parameters is done by first computing the conjugate gradient training direction and then suitable training rate in that direction.
+
+This method has proved to be more effective than gradient descent in training neural networks. Since it does not require the Hessian matrix, conjugate gradient is also recommended when we have very big neural networks.
+In the conjugate gradient training algorithm, the search is performed along conjugate directions which produces generally faster convergence than gradient descent directions. These training directions are conjugated with respect to the Hessian matrix.
+
+Let denote d the training direction vector. Then, starting with an initial parameter vector w0 and an initial training direction vector d0 = -g0, the conjugate gradient method constructs a sequence of training directions as:
+
+di+1 = gi+1 + di·γi,   i=0,1,...
+Here γ is called the conjugate parameter, and there are different ways to calculate it. Two of the most used are due to Fletcher and Reeves and to Polak and Ribiere. For all conjugate gradient algorithms, the training direction is periodically reset to the negative of the gradient.
+
+The parameters are then improved according to the next expression. The training rate, η, is usually found by line minimization.
+
+wi+1 = wi + di·ηi,   i=0,1,...
+
+
+3. Bayesian regularisation method: The key problem with neural nets tends to be preventing over-fitting. Bayesian regularisation (which restricts the magnitude of the weights) is one approach to this, structural stabilisation (i.e. restricting the number of hidden nodes and/or weights is another). Neither approach is a panacea, and generally a combination of regularisation and structural stabilisation is better (which means you need cross-validation again to select the network architecture - using the Bayesian evidence for this is a bad idea as the evidence is biased as a result of its use in tuning the regularisation parameters and unreliable if there is any model miss-specification). Which works best is essentially problem dependent, and the best way to find out is to try both and see (use e.g. cross-validation to estimate performance in an unbiased manner). 
+
+
+
